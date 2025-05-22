@@ -33,11 +33,7 @@ assets/
 ├── splash_screen.png # 스플래시 배경
 ├── login_screen_ver2.png # 로그인 배경
 └── (추후 추가될 캐릭터/아이템 이미지 등)
-
-
-
-
----
+```
 
 
 
@@ -47,10 +43,6 @@ assets/
 /login	LoginScreen
 /home	HomeScreen
 /store	StoreScreen
-
-
-
----
 
 
 
@@ -73,7 +65,6 @@ features/
 
 
 
+
 본 문서는 계속 업데이트될 예정입니다.
 구조 변경이나 기능 추가 시 함께 수정해 주세요.
-
-
