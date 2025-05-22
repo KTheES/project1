@@ -33,16 +33,19 @@ assets/
 ├── splash_screen.png # 스플래시 배경
 ├── login_screen_ver2.png # 로그인 배경
 └── (추후 추가될 캐릭터/아이템 이미지 등)
+...
 ```
 
 
 
 ## 🧭 라우트 구조
-경로	화면
-/	SplashScreen
-/login	LoginScreen
-/home	HomeScreen
-/store	StoreScreen
+
+| 경로      | 화면           |
+|----------|---------------|
+| `/`      | SplashScreen  |
+| `/login` | LoginScreen   |
+| `/home`  | HomeScreen    |
+| `/store` | StoreScreen   |
 
 
 
@@ -52,6 +55,7 @@ features/
 ├── todo/                    # 할 일 CRUD + 날짜 분류
 ├── pet/                     # 캐릭터 성장 및 상태 관리
 ├── inventory/               # 아이템 소유, 착용 상태
+...
 ```
 
 
