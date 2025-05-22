@@ -11,7 +11,7 @@ class LoginScreen extends StatelessWidget {
           // 배경 이미지
           Positioned.fill(
             child: Image.asset(
-              'assets/images/login_screen.png',
+              'assets/images/login_screen_ver2.png',
               fit: BoxFit.cover,
             ),
           ),
