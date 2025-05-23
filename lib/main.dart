@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'firebase_options.dart';
 import 'config/app_routes.dart';
 
 void main() {
