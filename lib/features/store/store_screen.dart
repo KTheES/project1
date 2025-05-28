@@ -1,44 +1,194 @@
 import 'package:flutter/material.dart';
+import 'package:light_western_food/config/app_routes.dart';
 
 class StoreScreen extends StatelessWidget {
   const StoreScreen({super.key});
 
+  final List<String> itemImages = const [
+    'assets/images/items/item_house.png',
+    'assets/images/items/item_bell.png',
+    'assets/images/items/item_bowl.png',
+    'assets/images/items/item_mouse.png',
+    'assets/images/items/item_tie.png',
+    'assets/images/items/item_wool.png',
+  ];
+
+  final List<String> itemPrices = const [
+    '500P',
+    '400P',
+    '350P',
+    '300P',
+    '250P',
+    '200P',
+  ];
+
+  void _showPurchaseDialog(BuildContext context, int index) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 40),
+              const Text(
+                '해당 아이템을 구매하시겠습니까?',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 36),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // ✅ Yes 버튼
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // 첫 팝업 닫기
+
+                      final overlayContext = Navigator.of(context).overlay!.context;
+
+                      showDialog(
+                        context: overlayContext,
+                        barrierDismissible: false,
+                        builder: (_) {
+                          return AlertDialog(
+                            backgroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                            content: SizedBox(
+                              height: 100,
+                              child: const Center(
+                                child: Text(
+                                  '성공적으로 구매되셨습니다',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      );
+
+                      Future.delayed(const Duration(milliseconds: 1500), () {
+                        Navigator.of(overlayContext).pop();
+                      });
+
+                      debugPrint('아이템 $index 구매함');
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    ),
+                    child: const Text('Yes'),
+                  ),
+                  const SizedBox(width: 16),
+                  // ❌ No 버튼
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // 첫 팝업만 닫기
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    ),
+                    child: const Text('No'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Stack은 여러 위젯을 겹쳐서 배치할 수 있도록 해주는 위젯
-      // 예: 배경 위에 아이템 목록을 겹쳐서 보여줄 때 사용
       body: Stack(
         children: [
-          // Positioned.fill은 Stack의 전체 영역을 채우도록 함
-          // 여기서는 배경 이미지를 화면 전체에 채워서 보여줌
           Positioned.fill(
             child: Image.asset(
-              'assets/images/store_background.png', // 배경 이미지 경로 (밤 배경, 건물, 캐릭터 포함된 통합 이미지)
-              fit: BoxFit.cover, // 이미지가 화면 크기에 맞게 비율을 유지하며 꽉 차도록 설정
+              'assets/images/store_background.png',
+              fit: BoxFit.cover,
             ),
           ),
 
-          // 가운데에 강아지집 모양 아이템들을 격자(Grid) 형태로 보여줌
-          Center(
-            child: GridView.count(
-              crossAxisCount: 3, // 한 줄에 아이템을 3개씩 배치 (총 9개라면 3x3 형태)
-              padding: const EdgeInsets.symmetric(
-                horizontal: 30, // 좌우 여백
-                vertical: 80,   // 상하 여백
+          // 홈 버튼 (왼쪽 최상단)
+          Positioned(
+            top: 30,
+            left: 30,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.of(context).pushNamed(AppRoutes.home); // 홈 화면으로 이동
+              },
+              child: ClipOval(
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  color: Colors.white.withOpacity(0.7),
+                  child: Image.asset(
+                    'assets/images/home_icon.png',
+                    fit: BoxFit.contain,
+                  ),
+                ),
               ),
-              children: List.generate(9, (index) {
-                // GestureDetector를 사용해 아이템을 터치할 수 있게 만듦
+            ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.only(top: 200),
+            child: GridView.count(
+              crossAxisCount: 3,
+              crossAxisSpacing: 20,
+              mainAxisSpacing: 30,
+              padding: const EdgeInsets.symmetric(horizontal: 30),
+              children: List.generate(itemImages.length, (index) {
                 return GestureDetector(
                   onTap: () {
-                    // 아이템을 눌렀을 때 실행할 동작
-                    // 예: 구매 확인 창 띄우기, 포인트 차감 등
                     debugPrint('아이템 $index 클릭됨');
                   },
-                  // 실제로 화면에 표시될 아이템 이미지 (강아지집 형태)
-                  child: Image.asset(
-                    'assets/images/item_house.png', // 아이템 이미지 경로
-                    fit: BoxFit.contain, // 아이템 크기에 맞게 비율 유지하며 표시
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        width: 90,
+                        height: 90,
+                        child: Image.asset(
+                          itemImages[index],
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      ElevatedButton(
+                        onPressed: () {
+                          _showPurchaseDialog(context, index);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          backgroundColor: Colors.white.withOpacity(0.9),
+                          foregroundColor: Colors.black87,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 2,
+                        ),
+                        child: Text(
+                          itemPrices[index],
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
                   ),
                 );
               }),
