@@ -7,46 +7,53 @@ import 'package:light_western_food/features/home/home_screen.dart';
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
-  // 로그인 function
   Future<void> signInWithGoogle(BuildContext context) async {
-    try{
-      // 사용자에게 계정 선택 UI
+    print('⏳ Google Sign-In 시작됨');
+
+    try {
+      // 사용자 계정 선택 UI
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      if(googleUser == null) return;  // 로그인 취소함
+      if (googleUser == null) {
+        print('❌ 로그인 취소됨');
+        return;
+      }
+      print('✅ 사용자 선택됨: ${googleUser.email}');
 
-      //인증 정보 획득함
+      // 인증 토큰 획득
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      print('✅ 인증 토큰 획득 완료');
 
-      // firebase에 credential 생성 후 넘김
+      // Firebase 인증용 Credential 생성
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
-      // firebase 로그인
-      await FirebaseAuth.instance.signInWithCredential(credential);
+      print('🔐 Credential 생성 완료');
 
-      if(!context.mounted) return;
+      // Firebase에 로그인
+      final UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+      print('🎉 Firebase 로그인 성공: ${userCredential.user?.email}');
+
+      // 다음 화면으로 이동
+      if (!context.mounted) return;
       Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
+        context,
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
       );
-
     } catch (e) {
-      if(!context.mounted) return;    // 예외시 context 확인
+      print('❌ 로그인 중 오류 발생: $e');
 
-      if(kDebugMode) {                // 디버깅용 출력문입니다.
-        print('로그인 오류 발생 $e');
-      }
+      if (!context.mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(   // 실패 알림
-          SnackBar(
-              content: Text(
-                "로그인에 실패했습니다. 다시 시도해주세요.",
-                style: TextStyle(color: Colors.white),
-              ),
-              backgroundColor: Colors.grey,
-              duration: Duration(seconds: 2),
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "로그인에 실패했습니다. 다시 시도해주세요.",
+            style: TextStyle(color: Colors.white),
           ),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        ),
       );
     }
   }
@@ -64,29 +71,18 @@ class LoginScreen extends StatelessWidget {
             ),
           ),
 
-          // 구글 로그인 버튼 (아이콘 제거)
+          // 구글 로그인 버튼
           Align(
             alignment: Alignment.bottomCenter,
             child: Padding(
               padding: const EdgeInsets.only(bottom: 80),
-              child: GestureDetector(                     // image 버튼 처리용으로 썼습니다.
+              child: GestureDetector(
                 onTap: () => signInWithGoogle(context),
-                  // TODO: 구글 로그인 기능 구현
                 child: Image.asset(
                   'assets/images/google_login_button.png',
-                    width: 240,
-                    height: 60,
-                )
-
-                  // 일단 GestureDetector로 Button 처리 해놓았으나, 혹시 몰라 남겨둡니다.
-                // style: ElevatedButton.styleFrom(
-                //   backgroundColor: Colors.transparent, // 배경 이미지와 어울리게
-                //   shadowColor: Colors.transparent,
-                //   foregroundColor: Colors.transparent, // 텍스트 보이지 않도록
-                //   padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 40), // 클릭 범위 확보
-                // ),
-                // child: const Text(''), // 텍스트 없음
-
+                  width: 240,
+                  height: 60,
+                ),
               ),
             ),
           ),

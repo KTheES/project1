@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'config/app_routes.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
@@ -14,8 +19,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'To-Do List With Your Pet',
       debugShowCheckedModeBanner: false,
-      initialRoute: AppRoutes.splash, // 앱 시작화면
-      routes: AppRoutes.routes,        // 화면 라우팅 설정
+      initialRoute: AppRoutes.splash,
+      routes: AppRoutes.routes,
     );
   }
 }

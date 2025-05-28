@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:async';
 
 class SplashScreen extends StatefulWidget {
@@ -13,8 +12,14 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Timer(const Duration(seconds: 2), () {
-      Navigator.pushReplacementNamed(context, '/home');
+
+    // WidgetsBinding을 사용해 프레임 렌더링 후 Timer 시작
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Timer(const Duration(seconds: 2), () {
+        if (mounted) {
+          Navigator.pushReplacementNamed(context, '/login');
+        }
+      });
     });
   }
 
