@@ -1,9 +1,76 @@
-# Miscellaneous
-*.class
+# -------------------------------
+# 💡 기본 무시 목록
+# -------------------------------
 *.log
 *.pyc
 *.swp
 .DS_Store
+
+# -------------------------------
+# 🔧 빌드 시스템 관련
+# -------------------------------
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.melos_tool/
+
+# -------------------------------
+# 🧪 문서 및 심볼 관련
+# -------------------------------
+**/doc/api/
+app.*.symbols
+app.*.map.json
+
+# -------------------------------
+# 🔧 IDE 관련 파일
+# -------------------------------
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+
+# -------------------------------
+# 🧱 Android 관련
+# -------------------------------
+android/.gradle/
+android/app/build/
+*.apk
+*.aar
+.gradle/
+
+# -------------------------------
+# 🍎 iOS/macOS 관련
+# -------------------------------
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Flutter/Generated.xcconfig
+ios/Flutter/app.flx
+ios/Flutter/app.zip
+ios/Flutter/engine/
+ios/Pods/
+ios/Runner.xcworkspace/
+ios/Flutter/.last_build_id
+
+macos/Pods/
+macos/Runner.xcworkspace/
+macos/Flutter/GeneratedPluginRegistrant.swift
+
+# -------------------------------
+# 🔥 Firebase 관련
+# -------------------------------
+firebase_options.dart
+lib/firebase_options.dart
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+
+# -------------------------------
+# 🧪 기타 툴/이전 마이그레이션 흔적
+# -------------------------------
 .atom/
 .build/
 .buildlog/
@@ -11,43 +78,3 @@
 .svn/
 .swiftpm/
 migrate_working_dir/
-
-# IntelliJ related
-*.iml
-*.ipr
-*.iws
-.idea/
-
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-#.vscode/
-
-# Flutter/Dart/Pub related
-**/doc/api/
-**/ios/Flutter/.last_build_id
-.dart_tool/
-.flutter-plugins
-.flutter-plugins-dependencies
-.pub-cache/
-.pub/
-/build/
-
-# Symbolication related
-app.*.symbols
-
-# Obfuscation related
-app.*.map.json
-
-# Android Studio will place build artifacts here
-/android/app/debug
-/android/app/profile
-/android/app/release
-
-# Firebase config
-
-firebase_options.dart
-lib/firebase_options.dart
-android/app/google-services.json
-ios/Runner/GoogleService-Info.plist
-
