@@ -26,6 +26,10 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Future.delayed(const Duration(seconds: 2), () {
+      Navigator.pushReplacementNamed(context, '/home');
+    });
+
     return const Scaffold(
       backgroundColor: Colors.white,
       body: Center(
