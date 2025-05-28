@@ -14,12 +14,12 @@ class StoreScreen extends StatelessWidget {
   ];
 
   final List<String> itemPrices = const [
-    '500P',
-    '400P',
-    '350P',
-    '300P',
-    '250P',
-    '200P',
+    '50P',
+    '30P',
+    '10P',
+    '20P',
+    '30P',
+    '20P',
   ];
 
   void _showPurchaseDialog(BuildContext context, int index) {
