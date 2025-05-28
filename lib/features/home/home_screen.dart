@@ -1,10 +1,56 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  DateTime selectedDate = DateTime.now();
+  final TextEditingController _controller = TextEditingController();
+  String filter = 'all';
+
+  /// 날짜별 투두리스트 맵
+  Map<String, List<Map<String, dynamic>>> todoByDate = {};
+
+  String getDateKey(DateTime date) => DateFormat('yyyy-MM-dd').format(date);
+
+  void addTodo(String task) {
+    final key = getDateKey(selectedDate);
+    todoByDate[key] ??= [];
+    todoByDate[key]!.add({'task': task, 'done': false});
+    _controller.clear();
+    setState(() {});
+  }
+
+  void toggleTodo(int index) {
+    final key = getDateKey(selectedDate);
+    if (todoByDate[key] != null) {
+      todoByDate[key]![index]['done'] = !todoByDate[key]![index]['done'];
+      setState(() {});
+    }
+  }
+
+  void changeFilter(String newFilter) {
+    setState(() {
+      filter = newFilter;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final key = getDateKey(selectedDate);
+    final todos = todoByDate[key] ?? [];
+
+    final filteredTodos = filter == 'done'
+        ? todos.where((t) => t['done'] == true).toList()
+        : filter == 'undone'
+        ? todos.where((t) => t['done'] == false).toList()
+        : todos;
+
     return Scaffold(
       body: Column(
         children: [
@@ -19,9 +65,11 @@ class HomeScreen extends StatelessWidget {
                     fit: BoxFit.cover,
                   ),
                 ),
-                Center(
+                Positioned(
+                  left: 220,
+                  top: 160,
                   child: Image.asset(
-                    'assets/images/baby_lwf.png',
+                    'assets/images/baby_lwf.gif', // gif로 교체됨
                     width: 120,
                   ),
                 ),
@@ -38,15 +86,22 @@ class HomeScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(7, (index) {
                   final date = DateTime.now().add(Duration(days: index - 2));
+                  final formatted = DateFormat('MM/dd').format(date);
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 4),
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        setState(() {
+                          selectedDate = date;
+                        });
+                      },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
+                        backgroundColor: getDateKey(date) == getDateKey(selectedDate)
+                            ? Colors.purple[100]
+                            : Colors.white,
                         foregroundColor: Colors.black,
                       ),
-                      child: Text('${date.month}/${date.day}'),
+                      child: Text(formatted),
                     ),
                   );
                 }),
@@ -57,37 +112,30 @@ class HomeScreen extends StatelessWidget {
           // 3. 투두 리스트
           Expanded(
             flex: 4,
-            child: ListView(
+            child: ListView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              children: [
-                CheckboxListTile(
-                  value: true,
-                  onChanged: (val) {},
-                  title: Text('고양이 밥 주기'),
-                ),
-                CheckboxListTile(
-                  value: false,
-                  onChanged: (val) {},
-                  title: Text('스터디 하기'),
-                ),
-                CheckboxListTile(
-                  value: false,
-                  onChanged: (val) {},
-                  title: Text('산책 다녀오기'),
-                ),
-              ],
+              itemCount: filteredTodos.length,
+              itemBuilder: (context, index) {
+                final todo = filteredTodos[index];
+                return CheckboxListTile(
+                  value: todo['done'],
+                  onChanged: (_) => toggleTodo(todos.indexOf(todo)),
+                  title: Text(todo['task']),
+                );
+              },
             ),
           ),
 
-          // 4. 할 일 추가 영역
+          // 4. 할 일 추가
           Padding(
             padding: const EdgeInsets.all(12),
             child: Row(
               children: [
                 Expanded(
                   child: TextField(
+                    controller: _controller,
                     decoration: InputDecoration(
-                      hintText: '할 일 입력',
+                      hintText: '캔따개의 할 일',
                       filled: true,
                       fillColor: Colors.white,
                       border: OutlineInputBorder(),
@@ -96,19 +144,33 @@ class HomeScreen extends StatelessWidget {
                 ),
                 SizedBox(width: 8),
                 ElevatedButton(
-                  onPressed: () {},
-                  child: Text('추가'),
+                  onPressed: () {
+                    if (_controller.text.trim().isNotEmpty) {
+                      addTodo(_controller.text.trim());
+                    }
+                  },
+                  child: Text('냥'),
                 ),
               ],
             ),
           ),
 
-          // 5. 완료/미완료 필터 버튼
+          // 5. 필터 버튼
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              TextButton(onPressed: () {}, child: Text('완료된 투두')),
-              TextButton(onPressed: () {}, child: Text('완료되지 않은 투두')),
+              TextButton(
+                onPressed: () => changeFilter('done'),
+                child: Text('딴 캔'),
+              ),
+              TextButton(
+                onPressed: () => changeFilter('undone'),
+                child: Text('따야하는 캔'),
+              ),
+              TextButton(
+                onPressed: () => changeFilter('all'),
+                child: Text('다 먹은 캔'),
+              ),
             ],
           ),
         ],

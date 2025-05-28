@@ -10,9 +10,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  intl: ^0.18.1
   firebase_core: ^2.25.4
   firebase_auth: ^4.16.0
-  google_sign_in: ^6.1.5         # 🔽 6.3.0 → 6.1.5로 다운그레이드
+  google_sign_in: ^6.1.5
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   path_provider: ^2.1.1
@@ -32,7 +33,7 @@ flutter:
     - assets/images/login_screen_ver2.png
     - assets/images/google_login_button.png
     - assets/images/home_room.png
-    - assets/images/baby_lwf.png
+    - assets/images/baby_lwf.gif
 
 dependency_overrides:
   google_sign_in_ios: 5.8.0
