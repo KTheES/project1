@@ -87,7 +87,7 @@
     },
     {
       "name": "built_value",
-      "rootUri": "file:///C:/Users/espls/AppData/Local/Pub/Cache/hosted/pub.dev/built_value-8.10.0",
+      "rootUri": "file:///C:/Users/espls/AppData/Local/Pub/Cache/hosted/pub.dev/built_value-8.10.1",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
@@ -620,7 +620,7 @@
       "languageVersion": "3.7"
     }
   ],
-  "generated": "2025-05-29T02:47:02.082308Z",
+  "generated": "2025-05-29T05:22:46.321983Z",
   "generator": "pub",
   "generatorVersion": "3.7.2",
   "flutterRoot": "file:///C:/flutter",
