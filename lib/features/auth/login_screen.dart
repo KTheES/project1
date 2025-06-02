@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:light_western_food/features/home/home_screen.dart';
+import 'dart:io';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -11,6 +12,20 @@ class LoginScreen extends StatelessWidget {
     print('⏳ Google Sign-In 시작됨');
 
     try {
+      final GoogleSignIn googleSignIn; // 로그인 분기 처리
+      if (Platform.isAndroid) {
+        googleSignIn = GoogleSignIn();
+        print('📱 Android 환경에서 Google 로그인 시작');
+      } else if (Platform.isIOS) {
+        googleSignIn = GoogleSignIn(
+          scopes: ['email'],
+          hostedDomain: "", // 필요 시 설정
+        );
+        print('iOS 환경에서 Google 로그인 시작');
+      } else {
+        throw UnsupportedError("⚠이 플랫폼은 지원되지 않습니다"); // chrome으로 들어갔을 시 예외처리
+      }
+
       // 사용자 계정 선택 UI
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
       if (googleUser == null) {
