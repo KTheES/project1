@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.light_western_food_rebuilt"
+    namespace = "com.example.light_western_food"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "27.0.12077973"
 
