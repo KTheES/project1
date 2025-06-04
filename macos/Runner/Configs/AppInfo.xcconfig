@@ -5,10 +5,10 @@
 // 'flutter create' template.
 
 // The application's name. By default this is also the title of the Flutter window.
-PRODUCT_NAME = light_western_food
+PRODUCT_NAME = light_western_food_rebuilt
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.lightwesternfood.lightWesternFood
+PRODUCT_BUNDLE_IDENTIFIER = com.example.lightWesternFoodRebuilt
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2025 com.lightwesternfood. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2025 com.example. All rights reserved.

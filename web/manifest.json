@@ -1,11 +1,11 @@
 {
-    "name": "light_western_food",
-    "short_name": "light_western_food",
+    "name": "light_western_food_rebuilt",
+    "short_name": "light_western_food_rebuilt",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "갓생을 살면 경양식을 키울 수 있어요",
+    "description": "A new Flutter project.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
