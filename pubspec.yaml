@@ -2,6 +2,7 @@ name: light_western_food
 description: "갓생을 살면 경양식을 키울 수 있어요"
 
 publish_to: 'none'
+
 version: 1.0.0+1
 
 environment:
@@ -11,9 +12,9 @@ dependencies:
   flutter:
     sdk: flutter
   intl: ^0.18.1
-  firebase_core: ^2.25.4
-  firebase_auth: ^4.16.0
-  google_sign_in: ^6.1.5
+  firebase_core: ^2.24.2
+  firebase_auth: ^4.17.0
+  google_sign_in: ^6.2.1
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   path_provider: ^2.1.1
@@ -24,6 +25,8 @@ dev_dependencies:
     sdk: flutter
   hive_generator: ^2.0.1
   build_runner: ^2.4.6
+
+
   flutter_lints: ^5.0.0
 
 flutter:
@@ -34,6 +37,15 @@ flutter:
     - assets/images/google_login_button.png
     - assets/images/home_room.png
     - assets/images/baby_lwf.gif
+    - assets/images/home_icon.png
+    - assets/images/store_background.png
+    - assets/images/items/item_house.png
+    - assets/images/items/item_bell.png
+    - assets/images/items/item_bowl.png
+    - assets/images/items/item_mouse.png
+    - assets/images/items/item_tie.png
+    - assets/images/items/item_wool.png
 
 dependency_overrides:
   google_sign_in_ios: 5.8.0
+
