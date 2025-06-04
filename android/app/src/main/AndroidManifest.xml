@@ -1,6 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    package="com.example.light_western_food">
+
     <application
-        android:label="light_western_food"
+        android:label="temp_project"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

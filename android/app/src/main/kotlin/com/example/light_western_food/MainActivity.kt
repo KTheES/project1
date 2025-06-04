@@ -1,4 +1,4 @@
-package com.lightwesternfood.light_western_food
+package com.example.light_western_food
 
 import io.flutter.embedding.android.FlutterActivity
 
