@@ -1,7 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="light_western_food_rebuilt"
-        android:name="${applicationName}"
+        android:label="light_western_food"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
