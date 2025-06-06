@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,7 +17,37 @@ class _HomeScreenState extends State<HomeScreen> {
   /// 날짜별 투두리스트 맵
   Map<String, List<Map<String, dynamic>>> todoByDate = {};
 
+  // 위젯이 처음 생성될 때 Hive로부터 저장된 데이터를 불러옴
+  @override
+  void initState() {
+    super.initState();
+    loadTodosFromHive();
+  }
+
   String getDateKey(DateTime date) => DateFormat('yyyy-MM-dd').format(date);
+
+  // Hive에 투두 데이터를 저장
+  void saveTodosToHive() {
+    final box = Hive.box('todoBox'); // 'todoBox'라는 이름의 저장소 사용
+    box.put('todos', todoByDate); // 'todos'라는 키에 전체 맵 저장
+  }
+
+  // Hive에서 저장된 데이터를 불러오기
+  void loadTodosFromHive() {
+    final box = Hive.box('todoBox'); // 같은 저장소 사용
+    final stored = box.get('todos'); // 'todos' 키로부터 값 가져오기
+    if (stored != null && stored is Map) {
+      // Hive는 Map<dynamic, dynamic> 형태로 가져오기 때문에 타입 안전하게 변환
+      todoByDate = Map<String, List<Map<String, dynamic>>>.from(
+        stored.map((key, value) => MapEntry(
+          key,
+          List<Map<String, dynamic>>.from(
+              (value as List).map((e) => Map<String, dynamic>.from(e))),
+        )),
+      );
+      setState(() {}); // UI 갱신
+    }
+  }
 
   void addTodo(String task) {
     final key = getDateKey(selectedDate);
