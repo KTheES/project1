@@ -37,7 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final box = Hive.box('todoBox'); // 같은 저장소 사용
     final stored = box.get('todos'); // 'todos' 키로부터 값 가져오기
     if (stored != null && stored is Map) {
-      // Hive는 Map<dynamic, dynamic> 형태로 가져오기 때문에 타입 안전하게 변환
+      // Hive는 Map<dynamic, dynamic> 형태로 가져오기 때문에 타입 안전하게 변환됨.
       todoByDate = Map<String, List<Map<String, dynamic>>>.from(
         stored.map((key, value) => MapEntry(
           key,
@@ -45,7 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
               (value as List).map((e) => Map<String, dynamic>.from(e))),
         )),
       );
-      setState(() {}); // UI 갱신
+      setState(() {}); // UI 갱신합니다.
     }
   }
 
