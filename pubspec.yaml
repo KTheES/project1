@@ -45,6 +45,8 @@ flutter:
     - assets/images/items/item_mouse.png
     - assets/images/items/item_tie.png
     - assets/images/items/item_wool.png
+    - assets/images/purchase_button.png
+    - assets/images/purchased_button.png
 
 dependency_overrides:
   google_sign_in_ios: 5.8.0
