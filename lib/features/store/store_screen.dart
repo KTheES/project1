@@ -150,7 +150,7 @@ class _StoreScreenState extends State<StoreScreen> {
                       child: Text(
                         '아이템 구매 완료!',
                         textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
@@ -165,7 +165,7 @@ class _StoreScreenState extends State<StoreScreen> {
             debugPrint('아이템 $index 구매 완료');
           },
           child: Image.asset(
-            _isItemPurchased[index] ? _purchaseButtonImage : _purchaseButtonImage,
+            _isItemPurchased[index] ? _purchasedButtonImage : _purchaseButtonImage, // _isItemPurchased가 true면 _purchasedButtonImage 사용
             width: 90,
             height: 45,
             fit: BoxFit.contain,
