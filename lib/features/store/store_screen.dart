@@ -11,11 +11,11 @@ class StoreScreen extends StatefulWidget {
 class _StoreScreenState extends State<StoreScreen> {
 
   final List<String> itemImages = const [
-    'assets/images/items/item_bell.png',
-    'assets/images/items/item_bowl.png',
-    'assets/images/items/item_mouse.png',
-    'assets/images/items/item_tie.png',
-    'assets/images/items/item_wool.png',
+    'assets/images/items_store/bell.png',
+    'assets/images/items_store/bowl.png',
+    'assets/images/items_store/mouse.png',
+    'assets/images/items_store/ribbon.png',
+    'assets/images/items_store/wool.png',
   ];
 
   final List<String> itemPrices = const [
@@ -78,7 +78,7 @@ class _StoreScreenState extends State<StoreScreen> {
                 ),
               ),
 
-              const Spacer(flex: 1),
+              const SizedBox(height: 165),
 
               // 아이템 목록
               Padding(
@@ -90,9 +90,9 @@ class _StoreScreenState extends State<StoreScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         _buildItem(0),
-                        const SizedBox(width: 40),
+                        const SizedBox(width: 25),
                         _buildItem(1),
-                        const SizedBox(width: 40),
+                        const SizedBox(width: 25),
                         _buildItem(2),
                       ],
                     ),
@@ -101,14 +101,13 @@ class _StoreScreenState extends State<StoreScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         _buildItem(3),
-                        const SizedBox(width: 40),
+                        const SizedBox(width: 25),
                         _buildItem(4),
                       ],
                     ),
                   ],
                 ),
               ),
-              const Spacer(flex: 2),
             ],
           ),
         ),
@@ -121,8 +120,8 @@ class _StoreScreenState extends State<StoreScreen> {
       mainAxisSize: MainAxisSize.min,
       children: [
         SizedBox(
-          width: 90,
-          height: 90,
+          width: 100,
+          height: 100,
           child: Image.asset(
             itemImages[index],
             fit: BoxFit.contain,
