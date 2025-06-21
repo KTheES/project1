@@ -14,42 +14,6 @@
       },
       "oauth_client": [
         {
-          "client_id": "129201603121-o88q1prqve3v0jhpip6god3oigur4o63.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyClfaT4D_RkAzwfzep9pQsPYfq9SH5eQDU"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "129201603121-o88q1prqve3v0jhpip6god3oigur4o63.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "129201603121-aee04g7eaqgtptlvtqlkurisdu3gfn76.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.lightwesternfood.lightWesternFood"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:129201603121:android:7c3bc05f1dba4756198b10",
-        "android_client_info": {
-          "package_name": "com.lightwesternfood.light_western_food"
-        }
-      },
-      "oauth_client": [
-        {
           "client_id": "129201603121-8r3grc86kenma9ss65d8bvkn27co8fm5.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -83,7 +47,7 @@
               "client_type": 3
             },
             {
-              "client_id": "129201603121-aee04g7eaqgtptlvtqlkurisdu3gfn76.apps.googleusercontent.com",
+              "client_id": "129201603121-a67avkfpahr2csfvg4kda9n112q73ivu.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
                 "bundle_id": "com.lightwesternfood.lightWesternFood"

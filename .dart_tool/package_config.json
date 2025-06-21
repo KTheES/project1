@@ -69,7 +69,7 @@
     },
     {
       "name": "build_runner",
-      "rootUri": "file:///C:/Users/espls/AppData/Local/Pub/Cache/hosted/pub.dev/build_runner-2.4.14",
+      "rootUri": "file:///C:/Users/espls/AppData/Local/Pub/Cache/hosted/pub.dev/build_runner-2.4.15",
       "packageUri": "lib/",
       "languageVersion": "3.6"
     },
@@ -165,9 +165,9 @@
     },
     {
       "name": "firebase_auth",
-      "rootUri": "file:///C:/Users/espls/AppData/Local/Pub/Cache/hosted/pub.dev/firebase_auth-4.20.0",
+      "rootUri": "file:///C:/Users/espls/AppData/Local/Pub/Cache/hosted/pub.dev/firebase_auth-4.16.0",
       "packageUri": "lib/",
-      "languageVersion": "3.2"
+      "languageVersion": "2.18"
     },
     {
       "name": "firebase_auth_platform_interface",
@@ -491,7 +491,7 @@
       "name": "shelf_web_socket",
       "rootUri": "file:///C:/Users/espls/AppData/Local/Pub/Cache/hosted/pub.dev/shelf_web_socket-2.0.1",
       "packageUri": "lib/",
-      "languageVersion": "3.3"
+      "languageVersion": "3.5"
     },
     {
       "name": "sky_engine",
@@ -620,7 +620,7 @@
       "languageVersion": "3.7"
     }
   ],
-  "generated": "2025-06-21T05:32:40.217503Z",
+  "generated": "2025-06-21T05:12:36.666116Z",
   "generator": "pub",
   "generatorVersion": "3.7.2",
   "flutterRoot": "file:///C:/flutter",
