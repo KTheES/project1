@@ -67,6 +67,7 @@ firebase_options.dart
 lib/firebase_options.dart
 android/app/google-services.json
 ios/Runner/GoogleService-Info.plist
+firebase.json
 
 # -------------------------------
 # 🧪 기타 툴/이전 마이그레이션 흔적
