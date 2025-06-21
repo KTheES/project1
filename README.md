@@ -66,6 +66,7 @@ features/
 - Firebase Firestore (데이터 저장 예정)
 - Provider or Riverpod (상태 관리 예정)
 - Figma (UI 설계 도구)
+- Hive (상태 저장)
 
 
 

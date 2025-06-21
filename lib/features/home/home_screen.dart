@@ -57,11 +57,15 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {});
   }
 
-  void toggleTodo(int index) {
+  void toggleTodo(Map<String, dynamic> todo) {
     final key = getDateKey(selectedDate);
-    if (todoByDate[key] != null) {
-      todoByDate[key]![index]['done'] = !todoByDate[key]![index]['done'];
-      setState(() {});
+    final todos = todoByDate[key];
+    if (todos != null) {
+      final index = todos.indexOf(todo);
+      if (index != -1) {
+        todos[index]['done'] = !todos[index]['done'];
+        setState(() {});
+      }
     }
   }
 
@@ -76,11 +80,22 @@ class _HomeScreenState extends State<HomeScreen> {
     final key = getDateKey(selectedDate);
     final todos = todoByDate[key] ?? [];
 
-    final filteredTodos = filter == 'done'
-        ? todos.where((t) => t['done'] == true).toList()
-        : filter == 'undone'
-        ? todos.where((t) => t['done'] == false).toList()
-        : todos;
+    final List<Map<String, dynamic>> filteredTodos = () {
+      if (filter == 'done') {
+        // 오늘 날짜 기준 완료된 투두
+        return todos.where((t) => t['done'] == true).toList();
+      } else if (filter == 'undone') {
+        return todos.where((t) => t['done'] == false).toList();
+      } else if (filter == 'all') {
+        // 전체 날짜 기준 완료된 투두
+        return todoByDate.values
+            .expand((list) => list)
+            .where((t) => t['done'] == true)
+            .toList();
+      } else {
+        return todos;
+      }
+    }();
 
     return Scaffold(
       body: Column(
@@ -100,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   left: 220,
                   top: 160,
                   child: Image.asset(
-                    'assets/images/baby_lwf.gif', // gif로 교체됨
+                    'assets/images/baby_lwf.gif',
                     width: 120,
                   ),
                 ),
@@ -150,7 +165,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 final todo = filteredTodos[index];
                 return CheckboxListTile(
                   value: todo['done'],
-                  onChanged: (_) => toggleTodo(todos.indexOf(todo)),
+                  onChanged: (_) => toggleTodo(todo),
                   title: Text(todo['task']),
                 );
               },
