@@ -62,23 +62,20 @@ class _StoreScreenState extends State<StoreScreen> {
   @override
   void initState() {
     super.initState();
+    // 개발용: 앱 시작 시 SharedPreferences 데이터를 모두 초기화
+    _clearAllSharedPreferences();
+
+    // 일반용: 앱 시작 시 저장된 데이터를 로드
     _loadData();
   }
 
-  // StoreScreen 클래스 내부----개발용(초기화)
+  /// SharedPreferences 데이터 초기화
   Future<void> _clearAllSharedPreferences() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear(); // 모든 SharedPreferences 데이터 삭제
     debugPrint('DEBUG: SharedPreferences 데이터가 모두 초기화되었습니다.');
-    // ✨ 수정: 데이터 초기화 후, _loadData() 호출로 모든 변수 상태를 갱신
-    await _loadData(); // _purchasedItemIds와 userPoints를 SharedPreferences에서 다시 로드
-    // _loadData() 내부에 setState가 있으므로 별도 호출은 필요 없을 수 있으나,
-    // 확실하게 UI를 갱신하려면 여기에 setState()를 한 번 더 추가해주는 것이 좋습니다.
-    setState(() {
-      // 명시적으로 setState를 호출하여 _purchasedItemIds와 userPoints의 변경사항이 UI에 반영되도록 함
-      // _purchasedItemIds = {}; // 이 값은 _loadData()에서 이미 업데이트됩니다.
-      // userPoints = 100;       // 이 값도 _loadData()에서 업데이트됩니다.
-    });
+    await _loadData(); // 데이터 초기화 후 모든 변수 상태 갱신
+    setState(() {}); // UI 반영
   }
 
   Future<void> _loadData() async {
@@ -132,7 +129,9 @@ class _StoreScreenState extends State<StoreScreen> {
         ),
       );
       await Future.delayed(const Duration(milliseconds: 1500));
-      Navigator.of(context).pop();
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
     } else {
       showDialog(
         context: context,
@@ -161,7 +160,7 @@ class _StoreScreenState extends State<StoreScreen> {
         child: SafeArea(
           child: Column(
             children: [
-              // 홈 버튼
+              /// 홈 버튼
               Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: Align(

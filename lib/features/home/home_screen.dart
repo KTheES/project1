@@ -17,7 +17,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   DateTime selectedDate = DateTime.now();
   final TextEditingController _controller = TextEditingController();
   String filter = 'all';
+
+  /// 날짜별 투두리스트 맵
   Map<String, List<Map<String, dynamic>>> todoByDate = {};
+
   List<Item> _purchasedItems = [];
   String _currentCatImagePath = 'assets/images/baby_lwf.gif';
 
@@ -84,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   void _updateCatImagePathBasedOnState() {
     bool hasHammy = _purchasedItems.any((item) => item.id == 'hammy');
-    // Item? hammyItem = _purchasedItems.firstWhereOrNull((item) => item.id == 'hammy'); // 현재 이 객체는 직접 사용하지 않음
+    // Item? hammyItem = _purchasedItems.firstWhereOrNull((item) => item.id == 'hammy');
 
     bool hasBell = _purchasedItems.any((item) => item.id == 'bell');
     bool hasRibbon = _purchasedItems.any((item) => item.id == 'ribbon');
@@ -97,9 +100,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       } else {
         newImagePath = 'assets/images/character/hammy_little.png';
       }
-    }
-
-    else {
+    } else {
       if (_isLwfGrown) {
         if (hasBell && hasRibbon) {
           newImagePath = 'assets/images/character/adult_lwf_both.gif';
@@ -130,6 +131,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     }
   }
 
+  /// Hive에서 저장된 데이터를 불러오기
   void loadTodosFromHive() {
     final box = Hive.box('todoBox');
     final stored = box.get('todos');
@@ -166,14 +168,16 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           _totalCompletedTodos++;
           await _saveGrowthState();
 
-          if (_totalCompletedTodos >= 50 && !_isLwfGrown) {
+          if (_totalCompletedTodos >= 5 && !_isLwfGrown) {
             _isLwfGrown = true;
             await _saveGrowthState();
+            _showGrowthDialog('lwf');
           }
 
-          if (_purchasedItems.any((item) => item.id == 'hammy') && _totalCompletedTodos >= 50 && !_isHammyGrown) {
+          if (_purchasedItems.any((item) => item.id == 'hammy') && _totalCompletedTodos >= 5 && !_isHammyGrown) {
             _isHammyGrown = true;
             await _saveGrowthState();
+            _showGrowthDialog('hammy');
           }
         } else if (previousDoneState && !todos[index]['done']) {
           if (_totalCompletedTodos > 0) {
@@ -185,6 +189,41 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         _updateCatImagePathBasedOnState();
       }
     }
+  }
+
+  /// 성장 알림 다이얼로그 (텍스트만)
+  void _showGrowthDialog(String characterId) {
+    String message = '';
+
+    if (characterId == 'lwf') {
+      message = '양식이가 성장했어요!';
+    } else if (characterId == 'hammy') {
+      message = '햄이가 성장했어요!';
+    }
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        content: SizedBox(
+          height: 100,
+          child: Center(
+            child: Text(
+              message,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ),
+    );
+    Future.delayed(const Duration(milliseconds: 1500)).then((_) {
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+    });
   }
 
   void changeFilter(String newFilter) {
@@ -227,30 +266,42 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     .where((item) => ['bowl', 'mouse', 'wool'].contains(item.id))
                     .map((item) {
                   Offset position;
+                  double itemWidth;
+                  double itemHeight;
+
                   switch (item.id) {
                     case 'bowl':
-                      position = const Offset(50, 210);
+                      position = const Offset(30, 230);
+                      itemWidth = 90;
+                      itemHeight = 90;
                       break;
                     case 'mouse':
-                      position = const Offset(100, 150);
+                      position = const Offset(150, 147);
+                      itemWidth = 40;
+                      itemHeight = 40;
                       break;
                     case 'wool':
-                      position = const Offset(150, 100);
+                      position = const Offset(325, 240);
+                      itemWidth = 40;
+                      itemHeight = 40;
                       break;
                     default:
                       position = const Offset(10, 10);
+                      itemWidth = 80;
+                      itemHeight = 80;
+                      break;
                   }
                   return Positioned(
                     left: position.dx,
                     top: position.dy,
-                    child: Image.asset(item.homeImagePath, width: 80, height: 80),
+                    child: Image.asset(item.homeImagePath, width: itemWidth, height: itemHeight),
                   );
                 }).toList(),
               ],
             ),
           ),
 
-          // 2. 날짜 선택 버튼
+          /// 날짜 선택 버튼
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: SingleChildScrollView(
@@ -282,7 +333,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             ),
           ),
 
-          // 3. 투두 리스트
+          /// 투두 리스트
           Expanded(
             flex: 4,
             child: ListView.builder(
@@ -299,7 +350,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             ),
           ),
 
-          // 4. 할 일 추가
+          /// 할 일 추가
           Padding(
             padding: const EdgeInsets.all(12),
             child: Row(
@@ -328,7 +379,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             ),
           ),
 
-          // 5. 필터 버튼
+          /// 필터 버튼
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -352,7 +403,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 }
 
-// ✨ ListExtension은 HomeScreen 클래스 정의가 끝난 후 파일 하단에 위치해야 합니다.
 extension ListExtension<T> on List<T> {
   T? firstWhereOrNull(bool Function(T element) test) {
     for (var element in this) {
