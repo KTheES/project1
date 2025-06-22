@@ -60,6 +60,8 @@ flutter:
     - assets/images/character/adult_lwf_both.gif
     - assets/images/character/hammy_little.png
     - assets/images/character/hammy_growth.png
+    - assets/images/home_to_store_button.png
+
 
 dependency_overrides:
   google_sign_in_ios: 5.8.0

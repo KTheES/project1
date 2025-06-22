@@ -18,7 +18,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   final TextEditingController _controller = TextEditingController();
   String filter = 'all';
 
-  /// 날짜별 투두리스트 맵
   Map<String, List<Map<String, dynamic>>> todoByDate = {};
 
   List<Item> _purchasedItems = [];
@@ -87,8 +86,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   void _updateCatImagePathBasedOnState() {
     bool hasHammy = _purchasedItems.any((item) => item.id == 'hammy');
-    // Item? hammyItem = _purchasedItems.firstWhereOrNull((item) => item.id == 'hammy');
-
     bool hasBell = _purchasedItems.any((item) => item.id == 'bell');
     bool hasRibbon = _purchasedItems.any((item) => item.id == 'ribbon');
 
@@ -131,7 +128,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     }
   }
 
-  /// Hive에서 저장된 데이터를 불러오기
   void loadTodosFromHive() {
     final box = Hive.box('todoBox');
     final stored = box.get('todos');
@@ -191,7 +187,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     }
   }
 
-  /// 성장 알림 다이얼로그 (텍스트만)
   void _showGrowthDialog(String characterId) {
     String message = '';
 
@@ -258,8 +253,22 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   child: Image.asset('assets/images/home_room.png', fit: BoxFit.cover),
                 ),
                 Positioned(
-                  left: 220,
-                  top: 160,
+                  left: 16,
+                  top: 16,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(context, AppRoutes.store);
+                    },
+                    child: Image.asset(
+                      'assets/images/home_to_store_button.png',
+                      width: 115,
+                      height: 115,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  left: 290,
+                  top: 230,
                   child: Image.asset(_currentCatImagePath, width: 120),
                 ),
                 ..._purchasedItems
@@ -300,8 +309,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               ],
             ),
           ),
-
-          /// 날짜 선택 버튼
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: SingleChildScrollView(
@@ -332,8 +339,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               ),
             ),
           ),
-
-          /// 투두 리스트
           Expanded(
             flex: 4,
             child: ListView.builder(
@@ -349,8 +354,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               },
             ),
           ),
-
-          /// 할 일 추가
           Padding(
             padding: const EdgeInsets.all(12),
             child: Row(
@@ -378,8 +381,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               ],
             ),
           ),
-
-          /// 필터 버튼
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
