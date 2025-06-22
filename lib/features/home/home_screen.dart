@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:light_western_food/models/item.dart';
@@ -23,6 +24,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   List<Item> _purchasedItems = [];
 
   String _currentCatGifPath = 'assets/images/baby_lwf.gif';
+
+  // 위젯이 처음 생성될 때 Hive로부터 저장된 데이터를 불러옴
+  @override
+  void initState() {
+    super.initState();
+    loadTodosFromHive();
+  }
 
   String getDateKey(DateTime date) => DateFormat('yyyy-MM-dd').format(date);
 
@@ -92,6 +100,29 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     }
   }
 
+  // Hive에 투두 데이터를 저장
+  void saveTodosToHive() {
+    final box = Hive.box('todoBox'); // 'todoBox'라는 이름의 저장소 사용
+    box.put('todos', todoByDate); // 'todos'라는 키에 전체 맵 저장
+  }
+
+  // Hive에서 저장된 데이터를 불러오기
+  void loadTodosFromHive() {
+    final box = Hive.box('todoBox'); // 같은 저장소 사용
+    final stored = box.get('todos'); // 'todos' 키로부터 값 가져오기
+    if (stored != null && stored is Map) {
+      // Hive는 Map<dynamic, dynamic> 형태로 가져오기 때문에 타입 안전하게 변환됨.
+      todoByDate = Map<String, List<Map<String, dynamic>>>.from(
+        stored.map((key, value) => MapEntry(
+          key,
+          List<Map<String, dynamic>>.from(
+              (value as List).map((e) => Map<String, dynamic>.from(e))),
+        )),
+      );
+      setState(() {}); // UI 갱신합니다.
+    }
+  }
+
   void addTodo(String task) {
     final key = getDateKey(selectedDate);
     todoByDate[key] ??= [];
@@ -100,11 +131,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     setState(() {});
   }
 
-  void toggleTodo(int index) {
+  void toggleTodo(Map<String, dynamic> todo) {
     final key = getDateKey(selectedDate);
-    if (todoByDate[key] != null) {
-      todoByDate[key]![index]['done'] = !todoByDate[key]![index]['done'];
-      setState(() {});
+    final todos = todoByDate[key];
+    if (todos != null) {
+      final index = todos.indexOf(todo);
+      if (index != -1) {
+        todos[index]['done'] = !todos[index]['done'];
+        setState(() {});
+      }
     }
   }
 
@@ -119,11 +154,22 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     final key = getDateKey(selectedDate);
     final todos = todoByDate[key] ?? [];
 
-    final filteredTodos = filter == 'done'
-        ? todos.where((t) => t['done'] == true).toList()
-        : filter == 'undone'
-        ? todos.where((t) => t['done'] == false).toList()
-        : todos;
+    final List<Map<String, dynamic>> filteredTodos = () {
+      if (filter == 'done') {
+        // 오늘 날짜 기준 완료된 투두
+        return todos.where((t) => t['done'] == true).toList();
+      } else if (filter == 'undone') {
+        return todos.where((t) => t['done'] == false).toList();
+      } else if (filter == 'all') {
+        // 전체 날짜 기준 완료된 투두
+        return todoByDate.values
+            .expand((list) => list)
+            .where((t) => t['done'] == true)
+            .toList();
+      } else {
+        return todos;
+      }
+    }();
 
     return Scaffold(
       body: Column(
@@ -143,6 +189,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   left: 220,
                   top: 160,
                   child: Image.asset(
+                    'assets/images/baby_lwf.gif',
                     _currentCatGifPath,
                     width: 120,
                   ),
@@ -228,7 +275,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 final todo = filteredTodos[index];
                 return CheckboxListTile(
                   value: todo['done'],
-                  onChanged: (_) => toggleTodo(todos.indexOf(todo)),
+                  onChanged: (_) => toggleTodo(todo),
                   title: Text(todo['task']),
                 );
               },

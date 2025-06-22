@@ -31,10 +31,10 @@
               "client_type": 3
             },
             {
-              "client_id": "129201603121-aee04g7eaqgtptlvtqlkurisdu3gfn76.apps.googleusercontent.com",
+              "client_id": "129201603121-a67avkfpahr2csfvg4kda9n112q73ivu.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.lightwesternfood.lightWesternFood"
+                "bundle_id": "com.example.lightWesternFoodRebuilt"
               }
             }
           ]
@@ -83,10 +83,10 @@
               "client_type": 3
             },
             {
-              "client_id": "129201603121-aee04g7eaqgtptlvtqlkurisdu3gfn76.apps.googleusercontent.com",
+              "client_id": "129201603121-a67avkfpahr2csfvg4kda9n112q73ivu.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.lightwesternfood.lightWesternFood"
+                "bundle_id": "com.example.lightWesternFoodRebuilt"
               }
             }
           ]

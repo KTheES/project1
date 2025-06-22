@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'features/home/home_screen.dart';
 import 'firebase_options.dart';
 import 'config/app_routes.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
-void main() {
+void main() async{
   WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter(); // Hive 초기화
+
+  await Hive.openBox('todoBox'); // Hive 박스 열기- 투두 저장용입니다.
+
   runApp(const InitApp());
 }
 
@@ -37,11 +43,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'To-Do List With Your Pet',
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: AppRoutes.splash,
-      routes: AppRoutes.routes,
+      home: HomeScreen(),
     );
   }
 }

@@ -12,6 +12,15 @@ class StoreScreen extends StatefulWidget {
 }
 
 class _StoreScreenState extends State<StoreScreen> {
+  final List<String> itemImages = const [
+    'assets/images/items_store/bell.png',
+    'assets/images/items_store/bowl.png',
+    'assets/images/items_store/mouse.png',
+    'assets/images/items_store/ribbon.png',
+    'assets/images/items_store/wool.png',
+  ];
+
+  final List<int> itemPrices = const [30, 10, 20, 30, 20]; // ✅ 숫자형 가격
 
   final List<Item> availableItems = [
     Item(
@@ -49,6 +58,8 @@ class _StoreScreenState extends State<StoreScreen> {
   final String _purchasedButtonImage = 'assets/images/purchased_button.png';
 
   Set<String> _purchasedItemIds = {};
+  late List<bool> _isItemPurchased;
+  int userPoints = 100;
 
   @override
   void initState() {
@@ -74,6 +85,28 @@ class _StoreScreenState extends State<StoreScreen> {
       .map((item) => item.toJson())
       .toList();
     await prefs.setString('purchasedItems', jsonEncode(itemsToSave));
+    _isItemPurchased = List.generate(itemImages.length, (index) => false);
+    _loadData(); // ✅ 포인트 & 구매 상태 불러오기
+  }
+
+  Future<void> _loadData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      userPoints = prefs.getInt('user_points') ?? 100;
+      final purchasedList = prefs.getStringList('purchased_items');
+      if (purchasedList != null && purchasedList.length == itemImages.length) {
+        _isItemPurchased = purchasedList.map((e) => e == 'true').toList();
+      }
+    });
+  }
+
+  Future<void> _saveData() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('user_points', userPoints);
+    await prefs.setStringList(
+      'purchased_items',
+      _isItemPurchased.map((e) => e.toString()).toList(),
+    );
   }
 
   @override
@@ -115,14 +148,15 @@ class _StoreScreenState extends State<StoreScreen> {
                   ),
                 ),
               ),
-
+              Text(
+                '보유 포인트: $userPoints P',
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+              ),
               const SizedBox(height: 165),
-
-              // 아이템 목록
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
-                  mainAxisSize: MainAxisSize.min, // 아이템 목록 Column은 최소 공간만 차지
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -177,36 +211,58 @@ class _StoreScreenState extends State<StoreScreen> {
               _purchasedItemIds.add(item.id);
             });
             await _savePurchasedItems();
+              : () async {
+                  if (userPoints >= itemPrices[index]) {
+                    setState(() {
+                      _isItemPurchased[index] = true;
+                      userPoints -= itemPrices[index];
+                    });
+                    await _saveData(); // ✅ 저장
 
-            showDialog(
-              context: context,
-              barrierDismissible: false,
-              builder: (_) {
-                return AlertDialog(
-                  backgroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  content: const SizedBox(
-                    height: 100,
-                    child: Center(
-                      child: Text(
-                        '아이템 구매 완료!',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (_) {
+                        return AlertDialog(
+                          backgroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                          content: const SizedBox(
+                            height: 100,
+                            child: Center(
+                              child: Text(
+                                '아이템 구매 완료!',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    );
+
+                    Future.delayed(const Duration(milliseconds: 1500), () {
+                      Navigator.of(context).pop();
+                    });
+
+                    debugPrint('아이템 $index 구매 완료');
+                  } else {
+                    showDialog(
+                      context: context,
+                      builder: (_) => AlertDialog(
+                        backgroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                        content: const Text(
+                          '포인트가 부족합니다!',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
                       ),
-                    ),
-                  ),
-                );
-              },
-            );
-
-            Future.delayed(const Duration(milliseconds: 1500), () {
-              Navigator.of(context).pop();
-            });
-
-            debugPrint('아이템 $index 구매 완료');
-          },
+                    );
+                  }
+                },
           child: Image.asset(
             isPurchased ? _purchasedButtonImage : _purchaseButtonImage, // _isItemPurchased가 true면 _purchasedButtonImage 사용
+            _isItemPurchased[index] ? _purchasedButtonImage : _purchaseButtonImage,
             width: 90,
             height: 45,
             fit: BoxFit.contain,
