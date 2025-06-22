@@ -25,6 +25,7 @@ dev_dependencies:
     sdk: flutter
   hive_generator: ^2.0.1
   build_runner: ^2.4.6
+  shared_preferences: ^2.0.15
 
 
   flutter_lints: ^5.0.0
@@ -46,6 +47,14 @@ flutter:
     - assets/images/items_store/wool.png
     - assets/images/purchase_button.png
     - assets/images/purchased_button.png
+    - assets/images/items_home/bell.png
+    - assets/images/items_home/bowl.png
+    - assets/images/items_home/mouse.png
+    - assets/images/items_home/ribbon.png
+    - assets/images/items_home/wool.png
+    - assets/images/items_home/baby_lwf_bell.gif
+    - assets/images/items_home/baby_lwf_ribbon.gif
+    - assets/images/items_home/baby_lwf_both.gif
 
 dependency_overrides:
   google_sign_in_ios: 5.8.0
