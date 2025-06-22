@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+import 'package:light_western_food/models/item.dart';
+import 'package:light_western_food/config/app_routes.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -9,35 +13,125 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   DateTime selectedDate = DateTime.now();
   final TextEditingController _controller = TextEditingController();
   String filter = 'all';
 
-  /// 날짜별 투두리스트 맵
   Map<String, List<Map<String, dynamic>>> todoByDate = {};
 
-  // 위젯이 처음 생성될 때 Hive로부터 저장된 데이터를 불러옴
+  List<Item> _purchasedItems = [];
+  String _currentCatImagePath = 'assets/images/baby_lwf.gif';
+
+  bool _isLwfGrown = false;
+  bool _isHammyGrown = false;
+  int _totalCompletedTodos = 0;
+
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     loadTodosFromHive();
+    _loadPurchasedItems();
+    _loadGrowthState();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _loadPurchasedItems();
+    }
   }
 
   String getDateKey(DateTime date) => DateFormat('yyyy-MM-dd').format(date);
 
-  // Hive에 투두 데이터를 저장
-  void saveTodosToHive() {
-    final box = Hive.box('todoBox'); // 'todoBox'라는 이름의 저장소 사용
-    box.put('todos', todoByDate); // 'todos'라는 키에 전체 맵 저장
+  Future<void> _loadGrowthState() async {
+    final prefs = await SharedPreferences.getInstance();
+    _isLwfGrown = prefs.getBool('isLwfGrown') ?? false;
+    _isHammyGrown = prefs.getBool('isHammyGrown') ?? false;
+    _totalCompletedTodos = prefs.getInt('totalCompletedTodos') ?? 0;
+
+    _updateCatImagePathBasedOnState();
+    setState(() {});
   }
 
-  // Hive에서 저장된 데이터를 불러오기
+  Future<void> _saveGrowthState() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLwfGrown', _isLwfGrown);
+    await prefs.setBool('isHammyGrown', _isHammyGrown);
+    await prefs.setInt('totalCompletedTodos', _totalCompletedTodos);
+  }
+
+  Future<void> _loadPurchasedItems() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? purchasedItemsJson = prefs.getString('purchasedItems');
+    if (purchasedItemsJson != null) {
+      final List<dynamic> jsonList = jsonDecode(purchasedItemsJson);
+      setState(() {
+        _purchasedItems = jsonList.map((json) => Item.fromJson(json)).toList();
+      });
+    } else {
+      setState(() {
+        _purchasedItems = [];
+      });
+    }
+    _updateCatImagePathBasedOnState();
+  }
+
+  void _updateCatImagePathBasedOnState() {
+    bool hasHammy = _purchasedItems.any((item) => item.id == 'hammy');
+    bool hasBell = _purchasedItems.any((item) => item.id == 'bell');
+    bool hasRibbon = _purchasedItems.any((item) => item.id == 'ribbon');
+
+    String newImagePath;
+
+    if (hasHammy) {
+      if (_isHammyGrown) {
+        newImagePath = 'assets/images/character/hammy_growth.png';
+      } else {
+        newImagePath = 'assets/images/character/hammy_little.png';
+      }
+    } else {
+      if (_isLwfGrown) {
+        if (hasBell && hasRibbon) {
+          newImagePath = 'assets/images/character/adult_lwf_both.gif';
+        } else if (hasBell) {
+          newImagePath = 'assets/images/character/adult_lwf_bell.gif';
+        } else if (hasRibbon) {
+          newImagePath = 'assets/images/character/adult_lwf_ribbon.gif';
+        } else {
+          newImagePath = 'assets/images/character/adult_lwf.gif';
+        }
+      } else {
+        if (hasBell && hasRibbon) {
+          newImagePath = 'assets/images/character/baby_lwf_both.gif';
+        } else if (hasBell) {
+          newImagePath = 'assets/images/character/baby_lwf_bell.gif';
+        } else if (hasRibbon) {
+          newImagePath = 'assets/images/character/baby_lwf_ribbon.gif';
+        } else {
+          newImagePath = 'assets/images/baby_lwf.gif';
+        }
+      }
+    }
+
+    if (_currentCatImagePath != newImagePath) {
+      setState(() {
+        _currentCatImagePath = newImagePath;
+      });
+    }
+  }
+
   void loadTodosFromHive() {
-    final box = Hive.box('todoBox'); // 같은 저장소 사용
-    final stored = box.get('todos'); // 'todos' 키로부터 값 가져오기
+    final box = Hive.box('todoBox');
+    final stored = box.get('todos');
     if (stored != null && stored is Map) {
-      // Hive는 Map<dynamic, dynamic> 형태로 가져오기 때문에 타입 안전하게 변환됨.
       todoByDate = Map<String, List<Map<String, dynamic>>>.from(
         stored.map((key, value) => MapEntry(
           key,
@@ -45,7 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
               (value as List).map((e) => Map<String, dynamic>.from(e))),
         )),
       );
-      setState(() {}); // UI 갱신합니다.
+      setState(() {});
     }
   }
 
@@ -57,16 +151,74 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {});
   }
 
-  void toggleTodo(Map<String, dynamic> todo) {
+  void toggleTodo(Map<String, dynamic> todo) async {
     final key = getDateKey(selectedDate);
     final todos = todoByDate[key];
     if (todos != null) {
       final index = todos.indexOf(todo);
       if (index != -1) {
+        bool previousDoneState = todos[index]['done'];
         todos[index]['done'] = !todos[index]['done'];
+
+        if (!previousDoneState && todos[index]['done']) {
+          _totalCompletedTodos++;
+          await _saveGrowthState();
+
+          if (_totalCompletedTodos >= 5 && !_isLwfGrown) {
+            _isLwfGrown = true;
+            await _saveGrowthState();
+            _showGrowthDialog('lwf');
+          }
+
+          if (_purchasedItems.any((item) => item.id == 'hammy') && _totalCompletedTodos >= 5 && !_isHammyGrown) {
+            _isHammyGrown = true;
+            await _saveGrowthState();
+            _showGrowthDialog('hammy');
+          }
+        } else if (previousDoneState && !todos[index]['done']) {
+          if (_totalCompletedTodos > 0) {
+            _totalCompletedTodos--;
+            await _saveGrowthState();
+          }
+        }
         setState(() {});
+        _updateCatImagePathBasedOnState();
       }
     }
+  }
+
+  void _showGrowthDialog(String characterId) {
+    String message = '';
+
+    if (characterId == 'lwf') {
+      message = '양식이가 성장했어요!';
+    } else if (characterId == 'hammy') {
+      message = '햄이가 성장했어요!';
+    }
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        content: SizedBox(
+          height: 100,
+          child: Center(
+            child: Text(
+              message,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ),
+    );
+    Future.delayed(const Duration(milliseconds: 1500)).then((_) {
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+    });
   }
 
   void changeFilter(String newFilter) {
@@ -82,48 +234,81 @@ class _HomeScreenState extends State<HomeScreen> {
 
     final List<Map<String, dynamic>> filteredTodos = () {
       if (filter == 'done') {
-        // 오늘 날짜 기준 완료된 투두
         return todos.where((t) => t['done'] == true).toList();
       } else if (filter == 'undone') {
         return todos.where((t) => t['done'] == false).toList();
-      } else if (filter == 'all') {
-        // 전체 날짜 기준 완료된 투두
-        return todoByDate.values
-            .expand((list) => list)
-            .where((t) => t['done'] == true)
-            .toList();
       } else {
-        return todos;
+        return todoByDate.values.expand((list) => list).where((t) => t['done'] == true).toList();
       }
     }();
 
     return Scaffold(
       body: Column(
         children: [
-          // 1. 배경 + 캐릭터
           Expanded(
             flex: 4,
             child: Stack(
               children: [
                 Positioned.fill(
-                  child: Image.asset(
-                    'assets/images/home_room.png',
-                    fit: BoxFit.cover,
+                  child: Image.asset('assets/images/home_room.png', fit: BoxFit.cover),
+                ),
+                Positioned(
+                  left: 16,
+                  top: 16,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(context, AppRoutes.store);
+                    },
+                    child: Image.asset(
+                      'assets/images/home_to_store_button.png',
+                      width: 115,
+                      height: 115,
+                    ),
                   ),
                 ),
                 Positioned(
-                  left: 220,
-                  top: 160,
-                  child: Image.asset(
-                    'assets/images/baby_lwf.gif',
-                    width: 120,
-                  ),
+                  left: 290,
+                  top: 230,
+                  child: Image.asset(_currentCatImagePath, width: 120),
                 ),
+                ..._purchasedItems
+                    .where((item) => ['bowl', 'mouse', 'wool'].contains(item.id))
+                    .map((item) {
+                  Offset position;
+                  double itemWidth;
+                  double itemHeight;
+
+                  switch (item.id) {
+                    case 'bowl':
+                      position = const Offset(30, 230);
+                      itemWidth = 90;
+                      itemHeight = 90;
+                      break;
+                    case 'mouse':
+                      position = const Offset(150, 147);
+                      itemWidth = 40;
+                      itemHeight = 40;
+                      break;
+                    case 'wool':
+                      position = const Offset(325, 240);
+                      itemWidth = 40;
+                      itemHeight = 40;
+                      break;
+                    default:
+                      position = const Offset(10, 10);
+                      itemWidth = 80;
+                      itemHeight = 80;
+                      break;
+                  }
+                  return Positioned(
+                    left: position.dx,
+                    top: position.dy,
+                    child: Image.asset(item.homeImagePath, width: itemWidth, height: itemHeight),
+                  );
+                }).toList(),
               ],
             ),
           ),
-
-          // 2. 날짜 선택 버튼
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: SingleChildScrollView(
@@ -154,8 +339,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-
-          // 3. 투두 리스트
           Expanded(
             flex: 4,
             child: ListView.builder(
@@ -171,8 +354,6 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
           ),
-
-          // 4. 할 일 추가
           Padding(
             padding: const EdgeInsets.all(12),
             child: Row(
@@ -200,8 +381,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
-
-          // 5. 필터 버튼
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -222,5 +401,16 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
     );
+  }
+}
+
+extension ListExtension<T> on List<T> {
+  T? firstWhereOrNull(bool Function(T element) test) {
+    for (var element in this) {
+      if (test(element)) {
+        return element;
+      }
+    }
+    return null;
   }
 }

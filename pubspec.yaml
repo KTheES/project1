@@ -19,14 +19,13 @@ dependencies:
   hive_flutter: ^1.1.0
   path_provider: ^2.0.15
   cupertino_icons: ^1.0.8
+  shared_preferences: ^2.2.2   # ✅ 여기에만 정확히 추가!
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   hive_generator: ^2.0.1
   build_runner: ^2.4.6
-
-
   flutter_lints: ^5.0.0
 
 flutter:
@@ -44,9 +43,25 @@ flutter:
     - assets/images/items_store/mouse.png
     - assets/images/items_store/ribbon.png
     - assets/images/items_store/wool.png
+    - assets/images/items_store/hammy.png
     - assets/images/purchase_button.png
     - assets/images/purchased_button.png
+    - assets/images/items_home/bell.png
+    - assets/images/items_home/bowl.png
+    - assets/images/items_home/mouse.png
+    - assets/images/items_home/ribbon.png
+    - assets/images/items_home/wool.png
+    - assets/images/character/baby_lwf_bell.gif
+    - assets/images/character/baby_lwf_ribbon.gif
+    - assets/images/character/baby_lwf_both.gif
+    - assets/images/character/adult_lwf.gif
+    - assets/images/character/adult_lwf_bell.gif
+    - assets/images/character/adult_lwf_ribbon.gif
+    - assets/images/character/adult_lwf_both.gif
+    - assets/images/character/hammy_little.png
+    - assets/images/character/hammy_growth.png
+    - assets/images/home_to_store_button.png
+
 
 dependency_overrides:
   google_sign_in_ios: 5.8.0
-
