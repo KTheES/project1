@@ -43,6 +43,7 @@ flutter:
     - assets/images/items_store/mouse.png
     - assets/images/items_store/ribbon.png
     - assets/images/items_store/wool.png
+    - assets/images/items_store/hammy.png
     - assets/images/purchase_button.png
     - assets/images/purchased_button.png
     - assets/images/items_home/bell.png
@@ -50,9 +51,15 @@ flutter:
     - assets/images/items_home/mouse.png
     - assets/images/items_home/ribbon.png
     - assets/images/items_home/wool.png
-    - assets/images/items_home/baby_lwf_bell.gif
-    - assets/images/items_home/baby_lwf_ribbon.gif
-    - assets/images/items_home/baby_lwf_both.gif
+    - assets/images/character/baby_lwf_bell.gif
+    - assets/images/character/baby_lwf_ribbon.gif
+    - assets/images/character/baby_lwf_both.gif
+    - assets/images/character/adult_lwf.gif
+    - assets/images/character/adult_lwf_bell.gif
+    - assets/images/character/adult_lwf_ribbon.gif
+    - assets/images/character/adult_lwf_both.gif
+    - assets/images/character/hammy_little.png
+    - assets/images/character/hammy_growth.png
 
 dependency_overrides:
   google_sign_in_ios: 5.8.0

@@ -17,29 +17,21 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   DateTime selectedDate = DateTime.now();
   final TextEditingController _controller = TextEditingController();
   String filter = 'all';
-
-  /// 날짜별 투두리스트 맵
   Map<String, List<Map<String, dynamic>>> todoByDate = {};
-
   List<Item> _purchasedItems = [];
+  String _currentCatImagePath = 'assets/images/baby_lwf.gif';
 
-  String _currentCatGifPath = 'assets/images/baby_lwf.gif';
-
-  // 위젯이 처음 생성될 때 Hive로부터 저장된 데이터를 불러옴
-  @override
-  void initState() {
-    super.initState();
-    loadTodosFromHive();
-  }
-
-  String getDateKey(DateTime date) => DateFormat('yyyy-MM-dd').format(date);
+  bool _isLwfGrown = false;
+  bool _isHammyGrown = false;
+  int _totalCompletedTodos = 0;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _loadTodoData();
+    loadTodosFromHive();
     _loadPurchasedItems();
+    _loadGrowthState();
   }
 
   @override
@@ -51,14 +43,27 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      // 스토어 화면에서 pop되어 돌아올 때는 Navigator.pop의 결과값을 사용하여 로드할 수 있으므로,
-      // 이 didChangeAppLifecycleState는 앱이 완전히 백그라운드에서 포그라운드로 돌아올 때 사용됩니다.
       _loadPurchasedItems();
     }
   }
 
-  void _loadTodoData() {
-    // 투두 리스트 데이터 로딩 로직 (현재는 앱 재시작 시 초기화)
+  String getDateKey(DateTime date) => DateFormat('yyyy-MM-dd').format(date);
+
+  Future<void> _loadGrowthState() async {
+    final prefs = await SharedPreferences.getInstance();
+    _isLwfGrown = prefs.getBool('isLwfGrown') ?? false;
+    _isHammyGrown = prefs.getBool('isHammyGrown') ?? false;
+    _totalCompletedTodos = prefs.getInt('totalCompletedTodos') ?? 0;
+
+    _updateCatImagePathBasedOnState();
+    setState(() {});
+  }
+
+  Future<void> _saveGrowthState() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLwfGrown', _isLwfGrown);
+    await prefs.setBool('isHammyGrown', _isHammyGrown);
+    await prefs.setInt('totalCompletedTodos', _totalCompletedTodos);
   }
 
   Future<void> _loadPurchasedItems() async {
@@ -68,50 +73,67 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       final List<dynamic> jsonList = jsonDecode(purchasedItemsJson);
       setState(() {
         _purchasedItems = jsonList.map((json) => Item.fromJson(json)).toList();
-        debugPrint('홈 화면: 구매된 아이템 로드됨: ${_purchasedItems.map((e) => e.id).join(', ')}');
       });
     } else {
       setState(() {
         _purchasedItems = [];
       });
     }
-    _updateCatGif();
+    _updateCatImagePathBasedOnState();
   }
 
-  void _updateCatGif() {
+  void _updateCatImagePathBasedOnState() {
+    bool hasHammy = _purchasedItems.any((item) => item.id == 'hammy');
+    // Item? hammyItem = _purchasedItems.firstWhereOrNull((item) => item.id == 'hammy'); // 현재 이 객체는 직접 사용하지 않음
+
     bool hasBell = _purchasedItems.any((item) => item.id == 'bell');
     bool hasRibbon = _purchasedItems.any((item) => item.id == 'ribbon');
 
-    String newGifPath;
-    if (hasBell && hasRibbon) {
-      newGifPath = 'assets/images/items_home/baby_lwf_both.gif';
-    } else if (hasBell) {
-      newGifPath = 'assets/images/items_home/baby_lwf_bell.gif';
-    } else if (hasRibbon) {
-      newGifPath = 'assets/images/items_home/baby_lwf_ribbon.gif';
-    } else {
-      newGifPath = 'assets/images/baby_lwf.gif';
+    String newImagePath;
+
+    if (hasHammy) {
+      if (_isHammyGrown) {
+        newImagePath = 'assets/images/character/hammy_growth.png';
+      } else {
+        newImagePath = 'assets/images/character/hammy_little.png';
+      }
     }
 
-    if (_currentCatGifPath != newGifPath) {
+    else {
+      if (_isLwfGrown) {
+        if (hasBell && hasRibbon) {
+          newImagePath = 'assets/images/character/adult_lwf_both.gif';
+        } else if (hasBell) {
+          newImagePath = 'assets/images/character/adult_lwf_bell.gif';
+        } else if (hasRibbon) {
+          newImagePath = 'assets/images/character/adult_lwf_ribbon.gif';
+        } else {
+          newImagePath = 'assets/images/character/adult_lwf.gif';
+        }
+      } else {
+        if (hasBell && hasRibbon) {
+          newImagePath = 'assets/images/character/baby_lwf_both.gif';
+        } else if (hasBell) {
+          newImagePath = 'assets/images/character/baby_lwf_bell.gif';
+        } else if (hasRibbon) {
+          newImagePath = 'assets/images/character/baby_lwf_ribbon.gif';
+        } else {
+          newImagePath = 'assets/images/baby_lwf.gif';
+        }
+      }
+    }
+
+    if (_currentCatImagePath != newImagePath) {
       setState(() {
-        _currentCatGifPath = newGifPath;
+        _currentCatImagePath = newImagePath;
       });
     }
   }
 
-  // Hive에 투두 데이터를 저장
-  void saveTodosToHive() {
-    final box = Hive.box('todoBox'); // 'todoBox'라는 이름의 저장소 사용
-    box.put('todos', todoByDate); // 'todos'라는 키에 전체 맵 저장
-  }
-
-  // Hive에서 저장된 데이터를 불러오기
   void loadTodosFromHive() {
-    final box = Hive.box('todoBox'); // 같은 저장소 사용
-    final stored = box.get('todos'); // 'todos' 키로부터 값 가져오기
+    final box = Hive.box('todoBox');
+    final stored = box.get('todos');
     if (stored != null && stored is Map) {
-      // Hive는 Map<dynamic, dynamic> 형태로 가져오기 때문에 타입 안전하게 변환됨.
       todoByDate = Map<String, List<Map<String, dynamic>>>.from(
         stored.map((key, value) => MapEntry(
           key,
@@ -119,7 +141,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               (value as List).map((e) => Map<String, dynamic>.from(e))),
         )),
       );
-      setState(() {}); // UI 갱신합니다.
+      setState(() {});
     }
   }
 
@@ -131,14 +153,36 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     setState(() {});
   }
 
-  void toggleTodo(Map<String, dynamic> todo) {
+  void toggleTodo(Map<String, dynamic> todo) async {
     final key = getDateKey(selectedDate);
     final todos = todoByDate[key];
     if (todos != null) {
       final index = todos.indexOf(todo);
       if (index != -1) {
+        bool previousDoneState = todos[index]['done'];
         todos[index]['done'] = !todos[index]['done'];
+
+        if (!previousDoneState && todos[index]['done']) {
+          _totalCompletedTodos++;
+          await _saveGrowthState();
+
+          if (_totalCompletedTodos >= 50 && !_isLwfGrown) {
+            _isLwfGrown = true;
+            await _saveGrowthState();
+          }
+
+          if (_purchasedItems.any((item) => item.id == 'hammy') && _totalCompletedTodos >= 50 && !_isHammyGrown) {
+            _isHammyGrown = true;
+            await _saveGrowthState();
+          }
+        } else if (previousDoneState && !todos[index]['done']) {
+          if (_totalCompletedTodos > 0) {
+            _totalCompletedTodos--;
+            await _saveGrowthState();
+          }
+        }
         setState(() {});
+        _updateCatImagePathBasedOnState();
       }
     }
   }
@@ -156,53 +200,33 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
     final List<Map<String, dynamic>> filteredTodos = () {
       if (filter == 'done') {
-        // 오늘 날짜 기준 완료된 투두
         return todos.where((t) => t['done'] == true).toList();
       } else if (filter == 'undone') {
         return todos.where((t) => t['done'] == false).toList();
-      } else if (filter == 'all') {
-        // 전체 날짜 기준 완료된 투두
-        return todoByDate.values
-            .expand((list) => list)
-            .where((t) => t['done'] == true)
-            .toList();
       } else {
-        return todos;
+        return todoByDate.values.expand((list) => list).where((t) => t['done'] == true).toList();
       }
     }();
 
     return Scaffold(
       body: Column(
         children: [
-          // 1. 배경 + 캐릭터
           Expanded(
             flex: 4,
             child: Stack(
               children: [
                 Positioned.fill(
-                  child: Image.asset(
-                    'assets/images/home_room.png',
-                    fit: BoxFit.cover,
-                  ),
+                  child: Image.asset('assets/images/home_room.png', fit: BoxFit.cover),
                 ),
                 Positioned(
                   left: 220,
                   top: 160,
-                  child: Image.asset(
-                    'assets/images/baby_lwf.gif',
-                    _currentCatGifPath,
-                    width: 120,
-                  ),
+                  child: Image.asset(_currentCatImagePath, width: 120),
                 ),
-
-                // 구매된 아이템 배치 로직
                 ..._purchasedItems
                     .where((item) => ['bowl', 'mouse', 'wool'].contains(item.id))
                     .map((item) {
-                  Offset position = Offset.zero;
-                  double itemWidth = 80;
-                  double itemHeight = 80;
-
+                  Offset position;
                   switch (item.id) {
                     case 'bowl':
                       position = const Offset(50, 210);
@@ -215,18 +239,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       break;
                     default:
                       position = const Offset(10, 10);
-                      break;
                   }
-
                   return Positioned(
                     left: position.dx,
                     top: position.dy,
-                    child: Image.asset(
-                      item.homeImagePath,
-                      width: itemWidth,
-                      height: itemHeight,
-                      fit: BoxFit.contain,
-                    ),
+                    child: Image.asset(item.homeImagePath, width: 80, height: 80),
                   );
                 }).toList(),
               ],
@@ -332,5 +349,17 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         ],
       ),
     );
+  }
+}
+
+// ✨ ListExtension은 HomeScreen 클래스 정의가 끝난 후 파일 하단에 위치해야 합니다.
+extension ListExtension<T> on List<T> {
+  T? firstWhereOrNull(bool Function(T element) test) {
+    for (var element in this) {
+      if (test(element)) {
+        return element;
+      }
+    }
+    return null;
   }
 }
