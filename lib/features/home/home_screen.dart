@@ -267,7 +267,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   ),
                 ),
                 Positioned(
-                  left: 290,
+                  left: 350,
                   top: 230,
                   child: Image.asset(_currentCatImagePath, width: 120),
                 ),
