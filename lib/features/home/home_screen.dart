@@ -56,7 +56,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     _isLwfGrown = prefs.getBool('isLwfGrown') ?? false;
     _isHammyGrown = prefs.getBool('isHammyGrown') ?? false;
     _totalCompletedTodos = prefs.getInt('totalCompletedTodos') ?? 0;
-
     _updateCatImagePathBasedOnState();
     setState(() {});
   }
@@ -92,32 +91,26 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     String newImagePath;
 
     if (hasHammy) {
-      if (_isHammyGrown) {
-        newImagePath = 'assets/images/character/hammy_growth.png';
-      } else {
-        newImagePath = 'assets/images/character/hammy_little.png';
-      }
+      newImagePath = _isHammyGrown
+          ? 'assets/images/character/hammy_growth.png'
+          : 'assets/images/character/hammy_little.png';
     } else {
       if (_isLwfGrown) {
-        if (hasBell && hasRibbon) {
-          newImagePath = 'assets/images/character/adult_lwf_both.gif';
-        } else if (hasBell) {
-          newImagePath = 'assets/images/character/adult_lwf_bell.gif';
-        } else if (hasRibbon) {
-          newImagePath = 'assets/images/character/adult_lwf_ribbon.gif';
-        } else {
-          newImagePath = 'assets/images/character/adult_lwf.gif';
-        }
+        newImagePath = hasBell && hasRibbon
+            ? 'assets/images/character/adult_lwf_both.gif'
+            : hasBell
+            ? 'assets/images/character/adult_lwf_bell.gif'
+            : hasRibbon
+            ? 'assets/images/character/adult_lwf_ribbon.gif'
+            : 'assets/images/character/adult_lwf.gif';
       } else {
-        if (hasBell && hasRibbon) {
-          newImagePath = 'assets/images/character/baby_lwf_both.gif';
-        } else if (hasBell) {
-          newImagePath = 'assets/images/character/baby_lwf_bell.gif';
-        } else if (hasRibbon) {
-          newImagePath = 'assets/images/character/baby_lwf_ribbon.gif';
-        } else {
-          newImagePath = 'assets/images/baby_lwf.gif';
-        }
+        newImagePath = hasBell && hasRibbon
+            ? 'assets/images/character/baby_lwf_both.gif'
+            : hasBell
+            ? 'assets/images/character/baby_lwf_bell.gif'
+            : hasRibbon
+            ? 'assets/images/character/baby_lwf_ribbon.gif'
+            : 'assets/images/baby_lwf.gif';
       }
     }
 
@@ -170,7 +163,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             _showGrowthDialog('lwf');
           }
 
-          if (_purchasedItems.any((item) => item.id == 'hammy') && _totalCompletedTodos >= 5 && !_isHammyGrown) {
+          if (_purchasedItems.any((item) => item.id == 'hammy') &&
+              _totalCompletedTodos >= 5 &&
+              !_isHammyGrown) {
             _isHammyGrown = true;
             await _saveGrowthState();
             _showGrowthDialog('hammy');
@@ -188,13 +183,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   void _showGrowthDialog(String characterId) {
-    String message = '';
-
-    if (characterId == 'lwf') {
-      message = '양식이가 성장했어요!';
-    } else if (characterId == 'hammy') {
-      message = '햄이가 성장했어요!';
-    }
+    String message = characterId == 'lwf' ? '양식이가 성장했어요!' : '햄이가 성장했어요!';
 
     showDialog(
       context: context,
@@ -229,6 +218,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     final key = getDateKey(selectedDate);
     final todos = todoByDate[key] ?? [];
 
@@ -253,57 +245,58 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   child: Image.asset('assets/images/home_room.png', fit: BoxFit.cover),
                 ),
                 Positioned(
-                  left: 16,
-                  top: 16,
+                  left: screenWidth * 0.04,
+                  top: screenHeight * 0.03,
                   child: GestureDetector(
                     onTap: () {
                       Navigator.pushNamed(context, AppRoutes.store);
                     },
                     child: Image.asset(
                       'assets/images/home_to_store_button.png',
-                      width: 115,
-                      height: 115,
+                      width: screenWidth * 0.15,
                     ),
                   ),
                 ),
                 Positioned(
-                  left: 350,
-                  top: 230,
-                  child: Image.asset(_currentCatImagePath, width: 120),
+                  left: screenWidth * 0.55,
+                  top: screenHeight * 0.27,
+                  child: Image.asset(_currentCatImagePath, width: screenWidth * 0.2),
                 ),
                 ..._purchasedItems
                     .where((item) => ['bowl', 'mouse', 'wool'].contains(item.id))
                     .map((item) {
-                  Offset position;
-                  double itemWidth;
-                  double itemHeight;
+                  double left, top, width, height;
 
                   switch (item.id) {
                     case 'bowl':
-                      position = const Offset(30, 230);
-                      itemWidth = 90;
-                      itemHeight = 90;
+                      left = screenWidth * 0.1;
+                      top = screenHeight * 0.27;
+                      width = screenWidth * 0.15;
+                      height = screenWidth * 0.15;
                       break;
                     case 'mouse':
-                      position = const Offset(150, 147);
-                      itemWidth = 40;
-                      itemHeight = 40;
+                      left = screenWidth * 0.4;
+                      top = screenHeight * 0.18;
+                      width = screenWidth * 0.08;
+                      height = screenWidth * 0.08;
                       break;
                     case 'wool':
-                      position = const Offset(325, 240);
-                      itemWidth = 40;
-                      itemHeight = 40;
+                      left = screenWidth * 0.7;
+                      top = screenHeight * 0.29;
+                      width = screenWidth * 0.08;
+                      height = screenWidth * 0.08;
                       break;
                     default:
-                      position = const Offset(10, 10);
-                      itemWidth = 80;
-                      itemHeight = 80;
+                      left = screenWidth * 0.1;
+                      top = screenHeight * 0.1;
+                      width = screenWidth * 0.1;
+                      height = screenWidth * 0.1;
                       break;
                   }
                   return Positioned(
-                    left: position.dx,
-                    top: position.dy,
-                    child: Image.asset(item.homeImagePath, width: itemWidth, height: itemHeight),
+                    left: left,
+                    top: top,
+                    child: Image.asset(item.homeImagePath, width: width, height: height),
                   );
                 }).toList(),
               ],
